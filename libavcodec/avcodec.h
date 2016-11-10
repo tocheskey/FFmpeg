@@ -3355,6 +3355,10 @@ typedef struct AVCodecContext {
     AVPacketSideData *coded_side_data;
     int            nb_coded_side_data;
 
+	// we can perform probe decoding to receive some info
+	int fcProbeDecoding;
+	int h264OutIdx;
+	
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);

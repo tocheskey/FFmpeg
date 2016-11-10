@@ -960,6 +960,9 @@ static void decode_postinit(H264Context *h, int setup_finished)
             out     = h->delayed_pic[i];
             out_idx = i;
         }
+	
+	h->avctx->h264OutIdx = out_idx;
+	
     if (h->avctx->has_b_frames == 0 &&
         (h->delayed_pic[0]->f->key_frame || h->delayed_pic[0]->mmco_reset))
         h->next_outputed_poc = INT_MIN;
@@ -1805,6 +1808,8 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
                 out     = h->delayed_pic[i];
                 out_idx = i;
             }
+		
+		h->avctx->h264OutIdx = out_idx;
 
         for (i = out_idx; h->delayed_pic[i]; i++)
             h->delayed_pic[i] = h->delayed_pic[i + 1];

@@ -200,31 +200,34 @@ int ff_h264_field_end(H264Context *h, H264SliceContext *sl, int in_setup)
      * past end by one (callers fault) and resync_mb_y != 0
      * causes problems for the first MB line, too.
      */
-    if (!FIELD_PICTURE(h) && h->current_slice && !h->sps.new && h->enable_er) {
-        int use_last_pic = h->last_pic_for_ec.f->buf[0] && !sl->ref_count[0];
+	if (!avctx->fcProbeDecoding)
+	{
+		if (!FIELD_PICTURE(h) && h->current_slice && !h->sps.new && h->enable_er) {
+			int use_last_pic = h->last_pic_for_ec.f->buf[0] && !sl->ref_count[0];
 
-        ff_h264_set_erpic(&sl->er.cur_pic, h->cur_pic_ptr);
+			ff_h264_set_erpic(&sl->er.cur_pic, h->cur_pic_ptr);
 
-        if (use_last_pic) {
-            ff_h264_set_erpic(&sl->er.last_pic, &h->last_pic_for_ec);
-            sl->ref_list[0][0].parent = &h->last_pic_for_ec;
-            memcpy(sl->ref_list[0][0].data, h->last_pic_for_ec.f->data, sizeof(sl->ref_list[0][0].data));
-            memcpy(sl->ref_list[0][0].linesize, h->last_pic_for_ec.f->linesize, sizeof(sl->ref_list[0][0].linesize));
-            sl->ref_list[0][0].reference = h->last_pic_for_ec.reference;
-        } else if (sl->ref_count[0]) {
-            ff_h264_set_erpic(&sl->er.last_pic, sl->ref_list[0][0].parent);
-        } else
-            ff_h264_set_erpic(&sl->er.last_pic, NULL);
+			if (use_last_pic) {
+				ff_h264_set_erpic(&sl->er.last_pic, &h->last_pic_for_ec);
+				sl->ref_list[0][0].parent = &h->last_pic_for_ec;
+				memcpy(sl->ref_list[0][0].data, h->last_pic_for_ec.f->data, sizeof(sl->ref_list[0][0].data));
+				memcpy(sl->ref_list[0][0].linesize, h->last_pic_for_ec.f->linesize, sizeof(sl->ref_list[0][0].linesize));
+				sl->ref_list[0][0].reference = h->last_pic_for_ec.reference;
+			} else if (sl->ref_count[0]) {
+				ff_h264_set_erpic(&sl->er.last_pic, sl->ref_list[0][0].parent);
+			} else
+				ff_h264_set_erpic(&sl->er.last_pic, NULL);
 
-        if (sl->ref_count[1])
-            ff_h264_set_erpic(&sl->er.next_pic, sl->ref_list[1][0].parent);
+			if (sl->ref_count[1])
+				ff_h264_set_erpic(&sl->er.next_pic, sl->ref_list[1][0].parent);
 
-        sl->er.ref_count = sl->ref_count[0];
+			sl->er.ref_count = sl->ref_count[0];
 
-        ff_er_frame_end(&sl->er);
-        if (use_last_pic)
-            memset(&sl->ref_list[0][0], 0, sizeof(sl->ref_list[0][0]));
-    }
+			ff_er_frame_end(&sl->er);
+			if (use_last_pic)
+				memset(&sl->ref_list[0][0], 0, sizeof(sl->ref_list[0][0]));
+		}
+	}
 #endif /* CONFIG_ERROR_RESILIENCE */
 
     if (!in_setup && !h->droppable)

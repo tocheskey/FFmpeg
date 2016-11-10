@@ -2533,6 +2533,9 @@ int ff_h264_execute_decode_slices(H264Context *h, unsigned context_count)
     AVCodecContext *const avctx = h->avctx;
     H264SliceContext *sl;
     int i, j;
+	
+	if (avctx->fcProbeDecoding)
+		return 0;
 
     av_assert0(context_count && h->slice_ctx[context_count - 1].mb_y < h->mb_height);
 
